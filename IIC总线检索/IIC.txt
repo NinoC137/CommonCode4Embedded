@@ -1,0 +1,8 @@
+	IIC_Init();
+	for (int address = 0x01; address < 0x7F; address++) 
+	{
+        uint8_t IIC_flag = I2C_BeginTransmission(address);
+        if (IIC_flag == 0) {
+            uart_printf("I2C device found at address 0x%02X\n", address);
+        }
+    }
