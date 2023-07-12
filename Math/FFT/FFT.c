@@ -219,24 +219,3 @@ void findPeaks(struct compx *data, int length) {
         }
     }
 }
-
-
-//直流滤波器
-//int dc_filter(int input,DC_FilterData * df)
-//{
-//
-//	float new_w  = input + df->w * df->a;
-//	int result = 5*(new_w - df->w);
-//	df->w = new_w;
-//
-//	return result;
-//}
-//
-//
-//int bw_filter(int input,BW_FilterData * bw) {
-//    bw->v0 = bw->v1;
-//
-//   // v1 = (3.04687470e-2 * input) + (0.9390625058 * v0);
-//    bw->v1 = (1.241106190967544882e-2*input)+(0.97517787618064910582 * bw->v0);
-//    return bw->v0 + bw->v1;
-//}
