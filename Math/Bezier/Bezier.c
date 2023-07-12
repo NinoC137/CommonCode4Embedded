@@ -83,7 +83,7 @@ int main(int argc, char **argv)
     fclose(fp);
 
     // 调用GUI.py绘图
-    system("python3 ./GUI_Bezier.py");
+    system("python3 ../GUI_Bezier.py");
     // end
 
     return 0;
