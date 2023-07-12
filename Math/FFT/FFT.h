@@ -4,25 +4,21 @@
 #include "stdint.h"
 #include "stdio.h"
 
-#define FFT_N 				512    //定义傅里叶变换的点数
-#define START_INDEX 	4  //低频过滤阈值
+#define FFT_N           512     //定义傅里叶变换的点数
+#define START_INDEX     4       //低频过滤阈值
+#define MAX_PEAKS       10      //最大峰值采集量
 
-struct compx     //定义一个复数结构
-{
-	float real;
-	float imag;
-};  
+//定义一个复数结构
+struct compx {
+    float real;
+    float imag;
+};
 
-//向下取整
-double my_floor(double x);
-//求余运算
-double my_fmod(double x, double y);
-//正弦函数
-double XSin( double x );
-//余弦函数 
-double XCos( double x );
-//开平方
-int qsqrt(int a);
+double my_floor(double x);              //向下取整
+double my_fmod(double x, double y);     //求余运算
+double XSin(double x);                  //正弦函数
+double XCos(double x);                  //余弦函数
+int qsqrt(int a);                       //开平方
 
 /*******************************************************************
 函数原型：struct compx EE(struct compx b1,struct compx b2)  
@@ -30,7 +26,8 @@ int qsqrt(int a);
 输入参数：两个以联合体定义的复数a,b
 输出参数：a和b的乘积，以联合体的形式输出
 *******************************************************************/
-struct compx EE(struct compx a,struct compx b);
+struct compx EE(struct compx a, struct compx b);
+
 /*****************************************************************
 函数原型：void FFT(struct compx *xin,int N)
 函数功能：对输入的复数组进行快速傅里叶变换（FFT）
@@ -38,27 +35,10 @@ struct compx EE(struct compx a,struct compx b);
 *****************************************************************/
 void FFT(struct compx *xin);
 
-//读取峰值
-int find_max_num_index(struct compx *data,int count);
+int find_max_index(struct compx *data, int length);     //读取最大峰值
+void findPeaks(struct compx *data, int length);         //读取极大峰值
 
-//typedef struct
-//{
-//	float w;
-//	int init;
-//	float a;
-//
-//}DC_FilterData;
-
-//直流滤波器
-//int dc_filter(int input,DC_FilterData * df);
-//
-//typedef struct
-//{
-//	float v0;
-//	float v1;
-//}BW_FilterData;
-//
-//int bw_filter(int input,BW_FilterData * bw);
-
+extern int peakIndexes[MAX_PEAKS];      //极大峰值索引
+extern int peakValues[MAX_PEAKS];       //极大峰值峰值
 
 #endif  /*__ALGORITHM_H*/

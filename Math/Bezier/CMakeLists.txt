@@ -6,4 +6,6 @@ set(CMAKE_C_STANDARD 11)
 include_directories(.)
 
 add_executable(Bezier
-        Bezier.c)
+        Bezier.c
+        Bezier.h
+        test.c)
