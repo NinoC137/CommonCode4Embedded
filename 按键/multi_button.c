@@ -7,8 +7,19 @@
 
 #define EVENT_CB(ev)   if(handle->cb[ev])handle->cb[ev]((Button*)handle)
 
+struct Button KEY1;
+struct Button KEY2;
+struct Button KEY3; //步进电机切换
+struct Button KEY4; //下药模式切换
+struct Button KEY5; //开启下药
+struct Button KEY6; //待定
+
+extern int gMode;
+extern int StepID;
+extern int SubBox_Buffer[4];
+
 //button handle list head.
-static struct Button* head_handle = NULL;
+static struct Button *head_handle = NULL;
 
 /**
   * @brief  Initializes the button struct handle.
@@ -17,13 +28,12 @@ static struct Button* head_handle = NULL;
   * @param  active_level: pressed GPIO level.
   * @retval None
   */
-void button_init(struct Button* handle, uint8_t(*pin_level)(), uint8_t active_level)
-{
-	memset(handle, 0, sizeof(struct Button));
-	handle->event = (uint8_t)NONE_PRESS;
-	handle->hal_button_Level = pin_level;
-	handle->button_level = handle->hal_button_Level();
-	handle->active_level = active_level;
+void button_init(struct Button *handle, uint8_t(*pin_level)(), uint8_t active_level) {
+    memset(handle, 0, sizeof(struct Button));
+    handle->event = (uint8_t) NONE_PRESS;
+    handle->hal_button_Level = pin_level;
+    handle->button_level = handle->hal_button_Level();
+    handle->active_level = active_level;
 }
 
 /**
@@ -33,9 +43,8 @@ void button_init(struct Button* handle, uint8_t(*pin_level)(), uint8_t active_le
   * @param  cb: callback function.
   * @retval None
   */
-void button_attach(struct Button* handle, PressEvent event, BtnCallback cb)
-{
-	handle->cb[event] = cb;
+void button_attach(struct Button *handle, PressEvent event, BtnCallback cb) {
+    handle->cb[event] = cb;
 }
 
 /**
@@ -43,9 +52,8 @@ void button_attach(struct Button* handle, PressEvent event, BtnCallback cb)
   * @param  handle: the button handle strcut.
   * @retval button event.
   */
-PressEvent get_button_event(struct Button* handle)
-{
-	return (PressEvent)(handle->event);
+PressEvent get_button_event(struct Button *handle) {
+    return (PressEvent) (handle->event);
 }
 
 /**
@@ -53,100 +61,99 @@ PressEvent get_button_event(struct Button* handle)
   * @param  handle: the button handle strcut.
   * @retval None
   */
-void button_handler(struct Button* handle)
-{
-	uint8_t read_gpio_level = handle->hal_button_Level();
+void button_handler(struct Button *handle) {
+    uint8_t read_gpio_level = handle->hal_button_Level();
 
-	//ticks counter working..
-	if((handle->state) > 0) handle->ticks++;
+    //ticks counter working..
+    if ((handle->state) > 0) handle->ticks++;
 
-	/*------------button debounce handle---------------*/
-	if(read_gpio_level != handle->button_level) { //not equal to prev one
-		//continue read 3 times same new level change
-		if(++(handle->debounce_cnt) >= DEBOUNCE_TICKS) {
-			handle->button_level = read_gpio_level;
-			handle->debounce_cnt = 0;
-		}
-	} else { //leved not change ,counter reset.
-		handle->debounce_cnt = 0;
-	}
+    /*------------button debounce handle---------------*/
+    if (read_gpio_level != handle->button_level) { //not equal to prev one
+        //continue read 3 times same new level change
+        if (++(handle->debounce_cnt) >= DEBOUNCE_TICKS) {
+            handle->button_level = read_gpio_level;
+            handle->debounce_cnt = 0;
+        }
+    } else { //leved not change ,counter reset.
+        handle->debounce_cnt = 0;
+    }
 
-	/*-----------------State machine-------------------*/
-	switch (handle->state) {
-	case 0:
-		if(handle->button_level == handle->active_level) {	//start press down
-			handle->event = (uint8_t)PRESS_DOWN;
-			EVENT_CB(PRESS_DOWN);
-			handle->ticks = 0;
-			handle->repeat = 1;
-			handle->state = 1;
-		} else {
-			handle->event = (uint8_t)NONE_PRESS;
-		}
-		break;
+    /*-----------------State machine-------------------*/
+    switch (handle->state) {
+        case 0:
+            if (handle->button_level == handle->active_level) {    //start press down
+                handle->event = (uint8_t) PRESS_DOWN;
+                EVENT_CB(PRESS_DOWN);
+                handle->ticks = 0;
+                handle->repeat = 1;
+                handle->state = 1;
+            } else {
+                handle->event = (uint8_t) NONE_PRESS;
+            }
+            break;
 
-	case 1:
-		if(handle->button_level != handle->active_level) { //released press up
-			handle->event = (uint8_t)PRESS_UP;
-			EVENT_CB(PRESS_UP);
-			handle->ticks = 0;
-			handle->state = 2;
+        case 1:
+            if (handle->button_level != handle->active_level) { //released press up
+                handle->event = (uint8_t) PRESS_UP;
+                EVENT_CB(PRESS_UP);
+                handle->ticks = 0;
+                handle->state = 2;
 
-		} else if(handle->ticks > LONG_TICKS) {
-			handle->event = (uint8_t)LONG_PRESS_START;
-			EVENT_CB(LONG_PRESS_START);
-			handle->state = 5;
-		}
-		break;
+            } else if (handle->ticks > LONG_TICKS) {
+                handle->event = (uint8_t) LONG_PRESS_START;
+                EVENT_CB(LONG_PRESS_START);
+                handle->state = 5;
+            }
+            break;
 
-	case 2:
-		if(handle->button_level == handle->active_level) { //press down again
-			handle->event = (uint8_t)PRESS_DOWN;
-			EVENT_CB(PRESS_DOWN);
-			handle->repeat++;
-			EVENT_CB(PRESS_REPEAT); // repeat hit
-			handle->ticks = 0;
-			handle->state = 3;
-		} else if(handle->ticks > SHORT_TICKS) { //released timeout
-			if(handle->repeat == 1) {
-				handle->event = (uint8_t)SINGLE_CLICK;
-				EVENT_CB(SINGLE_CLICK);
-			} else if(handle->repeat == 2) {
-				handle->event = (uint8_t)DOUBLE_CLICK;
-				EVENT_CB(DOUBLE_CLICK); // repeat hit
-			}
-			handle->state = 0;
-		}
-		break;
+        case 2:
+            if (handle->button_level == handle->active_level) { //press down again
+                handle->event = (uint8_t) PRESS_DOWN;
+                EVENT_CB(PRESS_DOWN);
+                handle->repeat++;
+                EVENT_CB(PRESS_REPEAT); // repeat hit
+                handle->ticks = 0;
+                handle->state = 3;
+            } else if (handle->ticks > SHORT_TICKS) { //released timeout
+                if (handle->repeat == 1) {
+                    handle->event = (uint8_t) SINGLE_CLICK;
+                    EVENT_CB(SINGLE_CLICK);
+                } else if (handle->repeat == 2) {
+                    handle->event = (uint8_t) DOUBLE_CLICK;
+                    EVENT_CB(DOUBLE_CLICK); // repeat hit
+                }
+                handle->state = 0;
+            }
+            break;
 
-	case 3:
-		if(handle->button_level != handle->active_level) { //released press up
-			handle->event = (uint8_t)PRESS_UP;
-			EVENT_CB(PRESS_UP);
-			if(handle->ticks < SHORT_TICKS) {
-				handle->ticks = 0;
-				handle->state = 2; //repeat press
-			} else {
-				handle->state = 0;
-			}
-		}else if(handle->ticks > SHORT_TICKS){ // long press up
-			handle->state = 0;
-		}
-		break;
+        case 3:
+            if (handle->button_level != handle->active_level) { //released press up
+                handle->event = (uint8_t) PRESS_UP;
+                EVENT_CB(PRESS_UP);
+                if (handle->ticks < SHORT_TICKS) {
+                    handle->ticks = 0;
+                    handle->state = 2; //repeat press
+                } else {
+                    handle->state = 0;
+                }
+            } else if (handle->ticks > SHORT_TICKS) { // long press up
+                handle->state = 0;
+            }
+            break;
 
-	case 5:
-		if(handle->button_level == handle->active_level) {
-			//continue hold trigger
-			handle->event = (uint8_t)LONG_PRESS_HOLD;
-			EVENT_CB(LONG_PRESS_HOLD);
+        case 5:
+            if (handle->button_level == handle->active_level) {
+                //continue hold trigger
+                handle->event = (uint8_t) LONG_PRESS_HOLD;
+                EVENT_CB(LONG_PRESS_HOLD);
 
-		} else { //releasd
-			handle->event = (uint8_t)PRESS_UP;
-			EVENT_CB(PRESS_UP);
-			handle->state = 0; //reset
-		}
-		break;
-	}
+            } else { //releasd
+                handle->event = (uint8_t) PRESS_UP;
+                EVENT_CB(PRESS_UP);
+                handle->state = 0; //reset
+            }
+            break;
+    }
 }
 
 /**
@@ -154,16 +161,15 @@ void button_handler(struct Button* handle)
   * @param  handle: target handle strcut.
   * @retval 0: succeed. -1: already exist.
   */
-int button_start(struct Button* handle)
-{
-	struct Button* target = head_handle;
-	while(target) {
-		if(target == handle) return -1;	//already exist.
-		target = target->next;
-	}
-	handle->next = head_handle;
-	head_handle = handle;
-	return 0;
+int button_start(struct Button *handle) {
+    struct Button *target = head_handle;
+    while (target) {
+        if (target == handle) return -1;    //already exist.
+        target = target->next;
+    }
+    handle->next = head_handle;
+    head_handle = handle;
+    return 0;
 }
 
 /**
@@ -171,18 +177,17 @@ int button_start(struct Button* handle)
   * @param  handle: target handle strcut.
   * @retval None
   */
-void button_stop(struct Button* handle)
-{
-	struct Button** curr;
-	for(curr = &head_handle; *curr; ) {
-		struct Button* entry = *curr;
-		if (entry == handle) {
-			*curr = entry->next;
+void button_stop(struct Button *handle) {
+    struct Button **curr;
+    for (curr = &head_handle; *curr;) {
+        struct Button *entry = *curr;
+        if (entry == handle) {
+            *curr = entry->next;
 //			free(entry);
-			return;//glacier add 2021-8-18
-		} else
-			curr = &entry->next;
-	}
+            return;//glacier add 2021-8-18
+        } else
+            curr = &entry->next;
+    }
 }
 
 /**
@@ -190,10 +195,92 @@ void button_stop(struct Button* handle)
   * @param  None.
   * @retval None
   */
-void button_ticks()
-{
-	struct Button* target;
-	for(target=head_handle; target; target=target->next) {
-		button_handler(target);
-	}
+void button_ticks() {
+    struct Button *target;
+    for (target = head_handle; target; target = target->next) {
+        button_handler(target);
+    }
+}
+
+uint8_t read_KEY1_GPIO() {
+    return HAL_GPIO_ReadPin(KEY1_GPIO_Port, KEY1_Pin);
+}
+
+uint8_t read_KEY2_GPIO() {
+    return HAL_GPIO_ReadPin(KEY2_GPIO_Port, KEY2_Pin);
+}
+
+uint8_t read_KEY3_GPIO() {
+    return HAL_GPIO_ReadPin(KEY3_GPIO_Port, KEY3_Pin);
+}
+
+uint8_t read_KEY4_GPIO() {
+    return HAL_GPIO_ReadPin(KEY4_GPIO_Port, KEY4_Pin);
+}
+
+uint8_t read_KEY5_GPIO() {
+    return HAL_GPIO_ReadPin(KEY5_GPIO_Port, KEY5_Pin);
+}
+
+uint8_t read_KEY6_GPIO() {
+    return HAL_GPIO_ReadPin(KEY6_GPIO_Port, KEY6_Pin);
+}
+
+void KEY1_PRESS_DOWN_Handler(void *btn){
+    printf("Hold\r\n");
+    Step_KeepMoving(&SM_For_SubBox, FORWARD, ENABLE);
+}
+
+void KEY2_PRESS_DOWN_Handler(void *btn){
+    Step_KeepMoving(&SM_For_SubBox, BACK, ENABLE);
+}
+
+void KEY3_PRESS_DOWN_Handler(void *btn) {
+    //do something...
+    //printf("KEY3 Press.\r\n");
+    if (StepID == STEPCUP) {
+        StepID = STEPBOX;
+    } else if (StepID == STEPBOX) {
+        StepID = STEPCUP;
+    }
+    printf("Motor Mode Change.\r\n");
+    // printf("Step Mode :%d\r\n", StepID);
+}
+
+void KEY4_PRESS_DOWN_Handler(void *btn) {
+    printf("KEY4 Press.\r\n");
+    if (gMode == NFCMODE) {
+        gMode = MANMODE;
+    } else if (gMode == MANMODE) {
+        gMode = NFCMODE;
+    }
+    printf("Drop Mode Change.\r\n");
+    // printf("Drop Mode :%d\r\n", gMode );
+
+}
+
+//声明从机步进电机的位置
+int BOX_ID = 3;
+void KEY5_PRESS_DOWN_Handler(void *btn) {
+    printf("KEY5 Press.\r\n");
+    //printf("Start Drop.\r\n");
+
+    BOX_ID--;
+    if (StepID == STEPBOX) {
+        SM_For_SubBox.Step2PointPlace(&SM_For_SubBox, SubBox_Buffer[BOX_ID]);
+    } else if (StepID == STEPCUP) {
+        SM_For_littleCup.Step2PointPlace(&SM_For_littleCup, 3);
+    }
+}
+
+void KEY6_PRESS_DOWN_Handler(void *btn) {
+    printf("KEY6 Press.\r\n");
+
+    BOX_ID++;
+    if (StepID == STEPBOX) {
+        SM_For_SubBox.Step2PointPlace(&SM_For_SubBox, SubBox_Buffer[BOX_ID]);
+    } else if (StepID == STEPCUP) {
+        SM_For_littleCup.Step2PointPlace(&SM_For_littleCup, 0);
+    }
+    BOX_ID = BOX_ID % 4;
 }

@@ -2,26 +2,26 @@
 #define __SG90_H
 
 //include
-#include "stm32f1xx_hal.h"
 #include "main.h"
 #include "cmsis_os.h"
 
-
+#define SG90_FINISH 1
+#define SG90_RUNNING 0
 //extern
 
 //SG90 OOP_By_C
 typedef struct SG90_OOC {
     //elements
     char *name;
-    uint8_t prTarget_Angle;
-    uint8_t prHighLevelTimes_Ms;
+    float prTarget_Angle;
+    float prHighLevelTimes_Ms;
 
     TIM_HandleTypeDef* TIMER;
     uint32_t TIM_Channel;
 
     //functions
-    int (*GetAngle2Pulse)(struct SG90_OOC *);
-    void (*SetAngle)(struct SG90_OOC *, int target_Angle);
+    float (*GetAngle2Pulse)(struct SG90_OOC *);
+    void (*SetAngle)(struct SG90_OOC *, float target_Angle);
     void (*Move2TargetAngle)(struct SG90_OOC *);
 } SG90;
 
@@ -29,8 +29,8 @@ typedef struct SG90_OOC {
 SG90 SG90_Create();
 
 //OOP function define
-int getAngle2Pulse(struct SG90_OOC * SG90);
-void setAngle(struct SG90_OOC * SG90, int target_Angle);
+float getAngle2Pulse(struct SG90_OOC * SG90);
+void setAngle(struct SG90_OOC * SG90, float target_Angle);
 void move2TargetAngle(struct SG90_OOC* SG90);
 
 //Application functions

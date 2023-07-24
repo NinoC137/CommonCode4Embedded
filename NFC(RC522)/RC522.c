@@ -1,4 +1,4 @@
-/*************笔记****************    //作者的笔记，仅供学习用途！！
+/*******************************
 1、CubeMX 定义任意两个引脚，作为复位脚和片选脚，并对引脚作出如下配置：
    GPlO output level       －－High
    GPIO mode               －－Output Open Drain
@@ -29,18 +29,18 @@
     MFRC_Init();//初始化
     PCD_Reset();//器件复位
     PCD_Request(PICC_REQALL, RxBuffer);//返回值为0，代表寻卡成功；并把卡类型存入RxBuffer中
-    PCD_Anticoll(RxBuffer);   //把（十六进制）的4个字节卡号存储在数组RxBuffer中
+    PCD_Anticoll(RxBuffer);   //把（十六进制）的4个字节卡号存储在数组RxBuffer中 MFRC_Init();//初始化
 
 4、完整例子在本代码尾部
 5、
 ***********************************/
 #include "main.h"
 #include "RC522.h"
-#include "cmsis_os.h"                          //我对原作者的程序进入了小小的修改，使之能运行在自己的stm32f103ze上
+#include "cmsis_os.h"
 //优点；对于NSS(SDA/CS)脚的使用,c语言使用语法高级
 #define RS522_RST(N) HAL_GPIO_WritePin(RC522_RST_GPIO_Port, RC522_RST_Pin, N==1?GPIO_PIN_SET:GPIO_PIN_RESET)
 #define RS522_NSS(N) HAL_GPIO_WritePin(RC522_CS_GPIO_Port, RC522_CS_Pin, N==1?GPIO_PIN_SET:GPIO_PIN_RESET)
-extern SPI_HandleTypeDef hspi2;
+extern SPI_HandleTypeDef hspi3;
 /**************************************************************************************
 * 函数名称：MFRC_Init
 * 功能描述：MFRC初始化
@@ -65,7 +65,7 @@ void MFRC_Init(void)
 static uint8_t ret;       //有些函数是HAL与标准库不同和地方，【读写函数】
 uint8_t SPI2_RW_Byte(uint8_t byte)
 {
-    HAL_SPI_TransmitReceive(&hspi2, &byte, &ret, 1, 10);//把byte写入，并读出一个值 存入ret
+    HAL_SPI_TransmitReceive(&hspi3, &byte, &ret, 1, 10);//把byte写入，并读出一个值 存入ret
     return   ret;                 //入口是byte的地址，读取时用的也是ret的地址；1：一次只写入一个值 10：timeout
 }
 
@@ -283,7 +283,6 @@ char MFRC_CmdFrame(uint8_t cmd, uint8_t *pInData, uint8_t InLenByte, uint8_t *pO
 
     MFRC_SetBitMask(MFRC_ControlReg, 0x80);               //停止定时器运行
     MFRC_WriteReg(MFRC_CommandReg, MFRC_IDLE);            //取消当前命令的执行
-
     return status;
 }
 
@@ -409,7 +408,6 @@ char PCD_Request(uint8_t RequestMode, uint8_t *pCardType)
         *pCardType = CmdFrameBuf[0];
         *(pCardType + 1) = CmdFrameBuf[1];
     }
-
     return status;
 }
 

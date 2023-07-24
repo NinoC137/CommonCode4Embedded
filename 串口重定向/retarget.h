@@ -6,6 +6,7 @@
 #include <stdio.h>
 
 void RetargetInit(UART_HandleTypeDef *huart);
+float Reformat_Float(const char* format);
 
 int _isatty(int fd);
 
