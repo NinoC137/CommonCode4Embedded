@@ -101,11 +101,11 @@ void CreateNewFile(char *_path, char* _fileName, char* _content)
     }
 
     /* 挂载文件系统 */
-//    result = f_mount(&fs, _path, 0);			/* Mount a logical drive */
-//    if (result != FR_OK)
-//    {
-//        uart_printf("mount fail (%s)\r\n", FR_Table[result]);
-//    }
+    result = f_mount(&fs, _path, 0);			/* Mount a logical drive */
+    if (result != FR_OK)
+    {
+        uart_printf("mount fail (%s)\r\n", FR_Table[result]);
+    }
 
     /* 打开文件 */
     sprintf(path, "%s%s", _path, _fileName);
@@ -134,7 +134,7 @@ void CreateNewFile(char *_path, char* _fileName, char* _content)
     f_close(&file);
 
     /* 卸载文件系统 */
-//    f_mount(NULL, _path, 0);
+    f_mount(NULL, _path, 0);
 }
 
 void ReadFileData(char *_path, char* _fileName)
@@ -149,11 +149,11 @@ void ReadFileData(char *_path, char* _fileName)
     }
 
     /* 挂载文件系统 */
-//    result = f_mount(&fs, _path, 0);			/* Mount a logical drive */
-//    if (result != FR_OK)
-//    {
-//        uart_printf("mount fail (%s)\r\n", FR_Table[result]);
-//    }
+    result = f_mount(&fs, _path, 0);			/* Mount a logical drive */
+    if (result != FR_OK)
+    {
+        uart_printf("mount fail (%s)\r\n", FR_Table[result]);
+    }
 
     /* 打开文件 */
     sprintf(path, "%s%s", _path, _fileName);
@@ -180,7 +180,7 @@ void ReadFileData(char *_path, char* _fileName)
     f_close(&file);
 
     /* 卸载文件系统 */
-//    f_mount(NULL, _path, 0);
+    f_mount(NULL, _path, 0);
 }
 
 
@@ -190,11 +190,11 @@ void CreateDir(char* _path, char* _dirName)
     char path[64];
 
     /* 挂载文件系统 */
-//    result = f_mount(&fs, _path, 0);            /* Mount a logical drive */
-//    if (result != FR_OK)
-//    {
-//        uart_printf("挂载文件系统失败 (%s)\r\n", FR_Table[result]);
-//    }
+    result = f_mount(&fs, _path, 0);            /* Mount a logical drive */
+    if (result != FR_OK)
+    {
+        uart_printf("挂载文件系统失败 (%s)\r\n", FR_Table[result]);
+    }
 
     if(strcmp(_path, "") == 0)
     {
@@ -219,7 +219,7 @@ void CreateDir(char* _path, char* _dirName)
     }
 
     /* 卸载文件系统 */
-//    f_mount(NULL, _path, 0);
+    f_mount(NULL, _path, 0);
 }
 
 void DeleteDirFile(char* _path, char* _fileName)
@@ -229,11 +229,11 @@ void DeleteDirFile(char* _path, char* _fileName)
     char path[64];
 
     /* 挂载文件系统 */
-//    result = f_mount(&fs, _path, 0);            /* Mount a logical drive */
-//    if (result != FR_OK)
-//    {
-//        uart_printf("挂载文件系统失败 (%s)\r\n", FR_Table[result]);
-//    }
+    result = f_mount(&fs, _path, 0);            /* Mount a logical drive */
+    if (result != FR_OK)
+    {
+        uart_printf("挂载文件系统失败 (%s)\r\n", FR_Table[result]);
+    }
 
     if(strcmp(_path, "") == 0)
     {
@@ -257,7 +257,7 @@ void DeleteDirFile(char* _path, char* _fileName)
     }
 
     /* 卸载文件系统 */
-//    f_mount(NULL, _path, 0);
+    f_mount(NULL, _path, 0);
 }
 
 void FileFormat(char *_path){
@@ -314,11 +314,11 @@ void ViewRootDir(char *_path)
     uart_printf("Open Dir:\t%s\r\n", _path);
 
     /* 挂载文件系统 */
-//    result = f_mount(&fs, _path, 0);	/* Mount a logical drive */
-//    if (result != FR_OK)
-//    {
-//        uart_printf("mount fail (%s)\r\n", FR_Table[result]);
-//    }
+    result = f_mount(&fs, _path, 0);	/* Mount a logical drive */
+    if (result != FR_OK)
+    {
+        uart_printf("mount fail (%s)\r\n", FR_Table[result]);
+    }
 
     /* 打开根文件夹 */
     result = f_opendir(&DirInf, _path); /* 如果不带参数，则从当前目录开�?? */
@@ -358,7 +358,7 @@ void ViewRootDir(char *_path)
     }
 
     /* 卸载文件系统 */
-//    f_mount(NULL, _path, 0);
+    f_mount(NULL, _path, 0);
 }
 
 
