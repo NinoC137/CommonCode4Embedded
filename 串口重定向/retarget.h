@@ -1,23 +1,27 @@
-#ifndef _RETARGET_H__
-#define _RETARGET_H__
 
-#include "stm32f1xx_hal.h"
-#include <sys/stat.h>
-#include <stdio.h>
+//
+// Created by nino on 23-6-18.
+//
 
-void RetargetInit(UART_HandleTypeDef *huart);
-float Reformat_Float(const char* format);
+#ifndef STM32H7_TEST_RETARGET_H
+#define STM32H7_TEST_RETARGET_H
 
-int _isatty(int fd);
+#include "main.h"
+#include "stdio.h"
+#include "stdlib.h"
+#include "stdarg.h"
+#include "string.h"
 
-int _write(int fd, char *ptr, int len);
+#include "cJSON.h"
 
-int _close(int fd);
+void uart_printf(const char *format, ...);
 
-int _lseek(int fd, int ptr, int dir);
+void uart2_printf(const char* format, ...);
 
-int _read(int fd, char *ptr, int len);
+void ReformatBuffer(uint8_t *buffer, float *afterReformat);
 
-int _fstat(int fd, struct stat *st);
+float Reformat_Float(const char *format);
 
-#endif //#ifndef _RETARGET_H__
+uint32_t Reformat_TOF(const char *format);
+
+#endif //STM32H7_TEST_RETARGET_H
