@@ -11,29 +11,40 @@ uint8_t uartBuffer[USARTBUFFER];
     因为DMA传输结束后,一定不为空,并且已将数据接收完毕,可以直接发送
 ***********************************************************************/
 
-{   
+osMutexDef(printfMutex);
+osMutexId printfMutex;
+void UARTTask(void const *argument) {
     int i;
     int array_empty_flag = 1;
 
+    printfMutex = osMutexCreate(osMutex(printfMutex));
+
+    uart_printf("Uart Task Start.\r\n");
     for (;;) {
-        HAL_UART_Receive_DMA(&huart3, &uartBuffer[0], USARTBUFFER);
-        for (i = 0; i < USARTBUFFER; i++) {
+        HAL_UART_Receive_DMA(&huart1, &uartBuffer[0], UARTBUFFER);
+        for (i = 0; i < UARTBUFFER; i++) {
             if (uartBuffer[i] != 0) {
                 array_empty_flag = 0;
+                break;
             }
         }
         if (array_empty_flag == 0) {
             array_empty_flag = 1;
-            printf("User String:    %s\r\n", uartBuffer);
-            
-            //User Functions Start
+            /*
+             * example:
+             * UartInput: x:+003,
+             * PWMValue[1] = 3;
+             * UartInput: x:+012,
+             * PWMValue[1] = 12;
+             * */
+            ReformatBuffer(uartBuffer, PWMValue);
+            uart_printf("PWM Value: %0.2f.\r\n", PWMValue[0]);
 
-            //User Functions End
+            memset(uartBuffer, 0, UARTBUFFER);
 
-            memset(uartBuffer, 0, USARTBUFFER);
-
-            HAL_UART_DMAStop(&huart3);
+            HAL_UART_DMAStop(&huart1);
         }
-        osDelay(500);
+        osDelay(100);
     }
+
 }
