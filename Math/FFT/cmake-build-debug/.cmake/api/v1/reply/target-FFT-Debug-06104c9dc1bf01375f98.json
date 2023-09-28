@@ -49,10 +49,7 @@
 			"compileCommandFragments" : 
 			[
 				{
-					"fragment" : "-g -fdiagnostics-color=always"
-				},
-				{
-					"fragment" : "-std=gnu11"
+					"fragment" : "-g -std=gnu11 -fdiagnostics-color=always"
 				}
 			],
 			"includes" : 

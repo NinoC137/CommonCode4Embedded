@@ -26,10 +26,10 @@ int main() {
     float *audioData = (float *) malloc(sizeof(float) * FFT_N);
     for (int i = 0; i < FFT_N; i++) {
         float time = (float) i / FFT_N;
-        float sample80Hz = XSin(2 * M_PI * 100 * time);
-        float sample500Hz = XSin(2 * M_PI * 128 * time);
-        float sample250Hz = XSin(2 * M_PI * 250 * time);
-        audioData[i] = sample80Hz + sample500Hz + sample250Hz;
+        float sample80Hz = XSin(8 * time);
+        float sample500Hz = XSin(1 * time);
+        float sample250Hz = XSin(8 * time);
+        audioData[i] = sample80Hz + sample500Hz*sample250Hz;
     }
 
     // Extract FFT_N samples

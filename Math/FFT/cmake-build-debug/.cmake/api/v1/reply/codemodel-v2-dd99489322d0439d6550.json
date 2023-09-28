@@ -39,7 +39,7 @@
 				{
 					"directoryIndex" : 0,
 					"id" : "FFT::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-FFT-Debug-ba4303b369c87b7502db.json",
+					"jsonFile" : "target-FFT-Debug-06104c9dc1bf01375f98.json",
 					"name" : "FFT",
 					"projectIndex" : 0
 				}
@@ -55,6 +55,6 @@
 	"version" : 
 	{
 		"major" : 2,
-		"minor" : 4
+		"minor" : 5
 	}
 }
