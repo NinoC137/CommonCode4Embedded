@@ -20,9 +20,7 @@
 #define ID_BOX2 9
 #define ID_BOX3 18
 #define ID_OUT  46
-//SM_For_littleCup Position ID
-#define Lit_INT 0
-#define Lit_OUT 8
+
 typedef struct StepMotor_OOP{
     //elements
     char* name;
@@ -32,13 +30,15 @@ typedef struct StepMotor_OOP{
     uint32_t CurrentPlace;
     uint32_t TargetPlace;
 
+    bool MotorState;
+
     //API functions
     char* (*Reset)(struct StepMotor_OOP *);                             //Reset to default place
     char* (*Step2PointPlace)(struct StepMotor_OOP *, uint32_t PlaceName);  //Step to NamedPlace
 }StepMotor;
 
 //Create an Oriented
-StepMotor StepMotor_Create(void);
+StepMotor StepMotor_Create(char* name ,TIM_HandleTypeDef* TIMER, uint32_t Channel);
 
 //OOP function define
 char* prReset(StepMotor * SM);

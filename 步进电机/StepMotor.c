@@ -1,7 +1,6 @@
 #include "StepMotor.h"
 
 StepMotor SM_For_SubBox;
-StepMotor SM_For_littleCup;
 int SubBox_Buffer[4]={ID_BOX1, ID_BOX2, ID_BOX3, ID_OUT };
 
 //Reset TargetPlace, it will make Motor back to default place.
@@ -29,8 +28,12 @@ char *prStep2PointPlace(StepMotor *SM, uint32_t PlaceName) {
     return SM->name;
 }
 
-StepMotor StepMotor_Create(void) {
+StepMotor StepMotor_Create(char* name, TIM_HandleTypeDef* TIMER, uint32_t Channel){
     StepMotor SM_temp;
+
+    SM_temp.name = name;
+    SM_temp.TIMER = TIMER;
+    SM_temp.Channel = Channel;
 
     SM_temp.CurrentPlace = 0;
     SM_temp.TargetPlace = 0;
@@ -41,22 +44,10 @@ StepMotor StepMotor_Create(void) {
 }
 
 void StepMotor_init(void) {
-    SM_For_SubBox = StepMotor_Create();
-    SM_For_littleCup = StepMotor_Create();
-
-    SM_For_SubBox.name = "SM_SubBox";
-    SM_For_SubBox.TIMER = &htim4;
-    SM_For_SubBox.Channel = TIM_CHANNEL_2;
-    SM_For_SubBox.CurrentPlace = ID_OUT;
-
-    SM_For_littleCup.name = "SM_LittleCup";
-    SM_For_littleCup.TIMER = &htim4;
-    SM_For_littleCup.Channel = TIM_CHANNEL_1;
-    SM_For_littleCup.CurrentPlace = Lit_INT;
+    SM_For_SubBox = StepMotor_Create("SM_SubBox", &htim4, TIM_CHANNEL_2);
 
     //输出50%占空比方波
             __HAL_TIM_SetCompare(SM_For_SubBox.TIMER, SM_For_SubBox.Channel, 250);
-            __HAL_TIM_SetCompare(SM_For_littleCup.TIMER, SM_For_littleCup.Channel,250);
 }
 
 char *Step_OnePeriod(const StepMotor *aStepMotor, uint8_t direct) {
@@ -69,10 +60,12 @@ char *Step_OnePeriod(const StepMotor *aStepMotor, uint8_t direct) {
         HAL_GPIO_WritePin(Direct_GPIO_Port, Direct_Pin, 0);
     }
 
-    while(!tim4_it_flag);
-    tim4_it_flag = 0;
-    HAL_TIM_PWM_Stop(aStepMotor->TIMER, aStepMotor->Channel);
+    //在定时器PWM中断中,发送转动一圈的PWM脉冲后将该标志位置1
+    while(!aStepMotor->MotorState);
+    aStepMotor->MotorState = 0;
+
     HAL_TIM_PWM_Stop_IT(aStepMotor->TIMER,aStepMotor->Channel);
+    HAL_TIM_PWM_Stop(aStepMotor->TIMER, aStepMotor->Channel);
     printf("One period.\r\n");
 
     return aStepMotor->name;

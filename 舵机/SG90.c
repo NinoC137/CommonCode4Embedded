@@ -86,19 +86,6 @@ void SG90_scan(void)     //左移为正，上移为正
     osDelay(500);
     setAngle_270(&Servo_yaw, 0); //0度
     osDelay(500);
-//    setAngle_270_slowly(&Servo_yaw, 140.006f-5.01f, 5); //-14.036度
-//    osDelay(100);
-//    setAngle_180_slowly(&Servo_pitch, -140.036f, 5); //26.565度
-//    osDelay(100);
-//    setAngle_270_slowly(&Servo_yaw, -140.036f+8.0f, 5); //14.036度
-//    osDelay(100);
-//    setAngle_180_slowly(&Servo_pitch, 140.036f, 5); //度
-//    osDelay(100);
-//    setAngle_270_slowly(&Servo_yaw, 140.006f-5.01f, 5); //0度
-//    osDelay(100);
-//    setAngle_180_slowly(&Servo_pitch, 0, 5); //0度
-//    osDelay(100);
-//    setAngle_270_slowly(&Servo_yaw, 0, 5); //0度
 }
 void SG90_move_pitch(struct SG90_OOC *SG90, float start_pitch, float end_pitch, float start_yaw, int time)
 {
@@ -158,13 +145,17 @@ void move2TargetAngle(struct SG90_OOC *SG90) {
             __HAL_TIM_SetCompare(SG90->TIMER, SG90->TIM_Channel, SG90->prHighLevelTimes_Ms);
 }
 
-SG90 SG90_Create() {
+SG90 SG90_Create(char* name, TIM_HandleTypeDef* TIMER, uint32_t Channel){
     SG90 sg90_temple;
+
+    sg90_temple.name = name;
+    sg90_temple.TIMER = TIMER;
+    sg90_temple.TIM_Channel = Channel;
+
     //default arguments
     sg90_temple.prTarget_Angle = 0;
     sg90_temple.prHighLevelTimes_Ms = 5;
-    sg90_temple.TIMER = NULL;
-    sg90_temple.TIM_Channel = 0;
+
     //functions define
     sg90_temple.GetAngle2Pulse = getAngle2Pulse;
     sg90_temple.SetAngle_180 = setAngle_180;
@@ -175,17 +166,8 @@ SG90 SG90_Create() {
 }
 
 void SG90_init() {
-    Servo_pitch = SG90_Create();
-    Servo_yaw = SG90_Create();
-
-    Servo_pitch.name = "First";
-    Servo_yaw.name = "Second";
-
-    Servo_pitch.TIMER = &htim15;
-    Servo_yaw.TIMER = &htim5;
-
-    Servo_pitch.TIM_Channel = TIM_CHANNEL_1;
-    Servo_yaw.TIM_Channel = TIM_CHANNEL_3;
+    Servo_pitch = SG90_Create("First", &htim15, TIM_CHANNEL_1);
+    Servo_yaw = SG90_Create("Second", &htim5, TIM_CHANNEL_3);
 
     HAL_TIM_PWM_Start(Servo_pitch.TIMER, Servo_pitch.TIM_Channel);
     HAL_TIM_PWM_Start(Servo_yaw.TIMER, Servo_yaw.TIM_Channel);
