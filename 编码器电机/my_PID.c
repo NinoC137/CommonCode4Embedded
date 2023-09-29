@@ -1,7 +1,7 @@
 #include "my_PID.h"
 
-PID PID_Motor_Left;
-PID PID_Motor_Right;
+PID servo_pitch;
+PID servo_yaw;
 
 /*************************************************************************
 *  函数名称：Pid_Value_Init()
@@ -13,8 +13,8 @@ PID PID_Motor_Right;
 *************************************************************************/
 void Pid_Value_Init(void)
 {
-    Pid_Init(&PID_Motor_Left, 0, 0, 0);
-    Pid_Init(&PID_Motor_Right, 0, 0, 0);
+    Pid_Init(&servo_pitch, -12.4, 0, 0);
+    Pid_Init(&servo_yaw, 0, 0, 0);
 }
 
 /*************************************************************************

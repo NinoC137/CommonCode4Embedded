@@ -2,9 +2,10 @@
 #define __MOTOR_H
 
 #include "cmsis_os.h"
-#include "timA.h"
-#include <driverlib.h>
-#include "msp.h"
+#include "my_PID.h"
+//#include "timA.h"
+//#include <driverlib.h>
+//#include "msp.h"
 
 #define FORWARD 1
 #define BACK 0
@@ -21,7 +22,6 @@ typedef struct Direct_Control_GPIO{
 //Motor OOP struct define
 typedef struct MOTOR{
     char* name;
-
     TIM_HandleTypeDef* TIMER;
     uint32_t Channel;
 
@@ -31,6 +31,8 @@ typedef struct MOTOR{
     uint8_t prDirect;
     float prTargetSpeed;
     float prRealSpeed;
+
+    PID PID_param;
 
     float (*GetSpeed)(const struct MOTOR *aMotor);
     float (*SetSpeed)(struct MOTOR *aMotor, uint8_t TargetSpeed);
