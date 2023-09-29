@@ -11,24 +11,24 @@
 
 #define RR 317
 
-#define LEFT_TIMER	(PERIPH_BASE +0x00000400)
-#define RIGHT_TIMER	(PERIPH_BASE +0x00000000)
-
 typedef struct Direct_Control_GPIO{
-    uint_fast8_t GPIOx;
-    uint16_t GPIO_Pin;
+    GPIO_TypeDef* GPIOx_1;
+    uint32_t GPIO_Pin_1;
+    GPIO_TypeDef* GPIOx_2;
+    uint32_t GPIO_Pin_2;
 }Direct_GPIO;
 
 //Motor OOP struct define
 typedef struct MOTOR{
     char* name;
-    uint32_t TIMER;
-    uint32_t TIM_Channel;
 
-    Direct_GPIO GPIO_1;
-    Direct_GPIO GPIO_2;
+    TIM_HandleTypeDef* TIMER;
+    uint32_t Channel;
 
-    uint8_t prDirect;       //��ת����
+    Direct_GPIO DirectIO_1;
+    Direct_GPIO DirectIO_2;
+
+    uint8_t prDirect;
     float prTargetSpeed;
     float prRealSpeed;
 
@@ -46,7 +46,7 @@ float prSetSpeed(struct MOTOR *aMotor, uint8_t TargetSpeed);
 char* prMotorEnable(struct MOTOR *aMotor, int8_t Pulse, uint8_t Enable);
 
 //OOP functions define
-Motor Motor_Create(void);
+Motor Motor_Create(char* name, TIM_HandleTypeDef* TIMER, uint32_t Channel, Direct_GPIO DirectIO);
 void Motor_Init(void);
 
 //private oriented
