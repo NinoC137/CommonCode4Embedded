@@ -99,6 +99,6 @@ void Motor_Init() {
     Motor_Right_IO.GPIOx_2 = GPIOA;
     Motor_Right_IO.GPIO_Pin_2 = GPIO_PIN_8;
 
-    Motor_Left = Motor_Create("Left_Motor", htim1, TIM_CHANNEL_1, Motor_Left_IO, &PID_Motor_Left);
-    Motor_Right = Motor_Create("Right_Motor", htim4, TIM_CHANNEL_2, Motor_Right_IO, &PID_Motor_Right);
+    Motor_Left = Motor_Create("Left_Motor", &htim1, TIM_CHANNEL_1, Motor_Left_IO, &PID_Motor_Left);
+    Motor_Right = Motor_Create("Right_Motor", &htim4, TIM_CHANNEL_2, Motor_Right_IO, &PID_Motor_Right);
 }
