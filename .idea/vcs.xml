@@ -2,7 +2,5 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/常用模块/MPU9250" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/通信协议相关/cJSON" vcs="Git" />
   </component>
 </project>
