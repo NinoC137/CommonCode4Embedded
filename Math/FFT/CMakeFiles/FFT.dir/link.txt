@@ -1,0 +1,1 @@
+/usr/bin/cc CMakeFiles/FFT.dir/FFT.c.o CMakeFiles/FFT.dir/test.c.o -o FFT  -lm 

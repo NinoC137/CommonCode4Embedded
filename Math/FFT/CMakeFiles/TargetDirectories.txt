@@ -1,0 +1,3 @@
+/home/nino/CommonCode4Embeded/Math/FFT/CMakeFiles/FFT.dir
+/home/nino/CommonCode4Embeded/Math/FFT/CMakeFiles/edit_cache.dir
+/home/nino/CommonCode4Embeded/Math/FFT/CMakeFiles/rebuild_cache.dir

@@ -50,7 +50,7 @@ int main() {
     find_max_index(s1, FFT_N / 2);
     findPeaks(s1, FFT_N / 2);
     //调用绘图脚本
-    system("python3 ../GUI_FFT.py");
+    system("python3 ./GUI_FFT.py");
 
     free(audioData);
     return 0;
