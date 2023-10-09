@@ -8,21 +8,7 @@
 int main() {
     struct compx s1[FFT_N + 16];
 
-//    float baseFrequency = 50.0f;  // 基础频率
-//    // Generate audio data
-//    float *audioData = (float *) malloc(sizeof(float) * FFT_N);
-//    for (int i = 0; i < FFT_N; i++) {
-//        float time = (float) i / FFT_N;
-//        float sample = 0.0f;
-//        for (int harmonic = 1; harmonic <= 5; harmonic++) {
-//            float frequency = baseFrequency * (float) harmonic;
-//            float amplitude = 1.0f / (float) harmonic;
-//            sample += (float) amplitude * (float) sin(2 * M_PI * frequency * time);
-//        }
-//        audioData[i] = sample;
-//    }
-
-    // Generate audio data
+    //开辟声音数据内存区
     float *audioData = (float *) malloc(sizeof(float) * FFT_N);
     for (int i = 0; i < FFT_N; i++) {
         float time = (float) i / FFT_N;
@@ -32,7 +18,7 @@ int main() {
         audioData[i] = sample80Hz + sample500Hz*sample250Hz;
     }
 
-    // Extract FFT_N samples
+    //采样声音数据
     for (int i = 0; i < FFT_N; i++) {
         s1[i].real = audioData[i];
         s1[i].imag = 0;
@@ -52,7 +38,7 @@ int main() {
     FFT(s1);
 
     FILE *fp = fopen("FFT_points.txt", "w");
-    // Print extracted samples
+    //将数据输出至文件,便于python脚本进行绘图 
     for (int i = 0; i < FFT_N / 2; i++) {
         int magnitude = qsqrt((int) (s1[i].real * s1[i].real + s1[i].imag * s1[i].imag)) * (2.0f / FFT_N); //归一化
         float frequency = (float) i;
@@ -63,7 +49,7 @@ int main() {
 
     find_max_index(s1, FFT_N / 2);
     findPeaks(s1, FFT_N / 2);
-
+    //调用绘图脚本
     system("python3 ../GUI_FFT.py");
 
     free(audioData);
