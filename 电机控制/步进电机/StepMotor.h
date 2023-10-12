@@ -12,6 +12,8 @@
 #define FORWARD 1
 #define BACK	0
 
+#define ONEPERIOD 6000  //6000个脉冲一圈
+
 //Sub_Box Position ID
 //这部分的数值改为各个位置相对于原点的圈数
 //如: ID_BOX1 20 代表从原点走到BOX1需要20圈
@@ -26,6 +28,7 @@ typedef struct StepMotor_OOP{
     char* name;
     TIM_HandleTypeDef* TIMER;
     uint32_t Channel;
+    uint32_t PulseCounter;
 
     uint32_t CurrentPlace;
     uint32_t TargetPlace;
@@ -50,7 +53,6 @@ char* Step_OnePeriod(const StepMotor * aStepMotor, uint8_t direct);
 char* Step_KeepMoving(const StepMotor * aStepMotor, uint8_t direct, uint8_t Enable);
 
 extern StepMotor SM_For_SubBox;
-extern StepMotor SM_For_littleCup;
 extern int SubBox_Buffer[4];
 
 

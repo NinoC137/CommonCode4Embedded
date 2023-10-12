@@ -1,7 +1,38 @@
 #include "StepMotor.h"
 
+/**
+ *  注意:
+ *  1. 需要开启PWM中断触发
+ *  2. 需要定义步进电机的方向控制IO脚为"Direct", 定时器上限数为500(可定义为其他数,但是要修改init函数中输出50%占空比方波部分) 
+ *  3. 参考Init文件中的对象定义方案, 提前配置好对应外设.
+ *  4. 在外设初始化完毕后,再调用步进电机的init函数
+ *  5. 请勿调用pr开头的函数, 这些函数都有在结构体中通过函数指针的方式进行调用
+ */
+
 StepMotor SM_For_SubBox;
 int SubBox_Buffer[4]={ID_BOX1, ID_BOX2, ID_BOX3, ID_OUT };
+
+void HAL_TIM_PWM_PulseFinishedCallback(TIM_HandleTypeDef *htim){
+    if(htim == SM_For_SubBox.TIMER){
+        if(HAL_GPIO_ReadPin(Direct_GPIO_Port, Direct_Pin) == FORWARD){
+            SM_For_SubBox.PulseCounter++;   //增加正向运动脉冲计数
+        }else{
+            SM_For_SubBox.PulseCounter--;   //减少正向运动脉冲计数
+        }
+
+        if(SM_For_SubBox.PulseCounter == ONEPERIOD){
+            SM_For_SubBox.MotorState = 1;   //完成一圈转动的标志位
+            SM_For_SubBox.CurrentPlace++;   //转动圈数+1
+        }
+    }
+}
+
+void StepMotor_init(void) {
+    SM_For_SubBox = StepMotor_Create("SM_SubBox", &htim4, TIM_CHANNEL_2);
+
+    //输出50%占空比方波
+            __HAL_TIM_SetCompare(SM_For_SubBox.TIMER, SM_For_SubBox.Channel, 250);
+}
 
 //Reset TargetPlace, it will make Motor back to default place.
 char *prReset(StepMotor *SM) {
@@ -41,13 +72,6 @@ StepMotor StepMotor_Create(char* name, TIM_HandleTypeDef* TIMER, uint32_t Channe
     SM_temp.Step2PointPlace = prStep2PointPlace;
 
     return SM_temp;
-}
-
-void StepMotor_init(void) {
-    SM_For_SubBox = StepMotor_Create("SM_SubBox", &htim4, TIM_CHANNEL_2);
-
-    //输出50%占空比方波
-            __HAL_TIM_SetCompare(SM_For_SubBox.TIMER, SM_For_SubBox.Channel, 250);
 }
 
 char *Step_OnePeriod(const StepMotor *aStepMotor, uint8_t direct) {
@@ -97,5 +121,3 @@ char *Step_KeepMoving(const StepMotor *aStepMotor, uint8_t direct, uint8_t Enabl
 
     return aStepMotor->name;
 }
-
-
