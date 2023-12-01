@@ -9,14 +9,10 @@
 
 struct Button KEY1;
 struct Button KEY2;
-struct Button KEY3; //步进电机切换
-struct Button KEY4; //下药模式切换
-struct Button KEY5; //开启下药
-struct Button KEY6; //待定
-
-extern int gMode;
-extern int StepID;
-extern int SubBox_Buffer[4];
+struct Button KEY3;
+struct Button KEY4;
+struct Button KEY5;
+struct Button KEY6;
 
 //button handle list head.
 static struct Button *head_handle = NULL;
@@ -223,64 +219,29 @@ uint8_t read_KEY5_GPIO() {
 }
 
 uint8_t read_KEY6_GPIO() {
-    return HAL_GPIO_ReadPin(KEY6_GPIO_Port, KEY6_Pin);
+    return HAL_GPIO_ReadPin(ENCD_KEY_GPIO_Port, ENCD_KEY_Pin);
 }
 
 void KEY1_PRESS_DOWN_Handler(void *btn){
-    printf("Hold\r\n");
-    Step_KeepMoving(&SM_For_SubBox, FORWARD, ENABLE);
+    HAL_UART_Transmit(&huart3, "key1 press\n", sizeof("key1 press\n") - 1, 0xffff);
 }
 
 void KEY2_PRESS_DOWN_Handler(void *btn){
-    Step_KeepMoving(&SM_For_SubBox, BACK, ENABLE);
+    HAL_UART_Transmit(&huart3, "key2 press\n", sizeof("key1 press\n") - 1, 0xffff);
 }
 
 void KEY3_PRESS_DOWN_Handler(void *btn) {
-    //do something...
-    //printf("KEY3 Press.\r\n");
-    if (StepID == STEPCUP) {
-        StepID = STEPBOX;
-    } else if (StepID == STEPBOX) {
-        StepID = STEPCUP;
-    }
-    printf("Motor Mode Change.\r\n");
-    // printf("Step Mode :%d\r\n", StepID);
+    HAL_UART_Transmit(&huart3, "key3 press\n", sizeof("key1 press\n") - 1, 0xffff);
 }
 
 void KEY4_PRESS_DOWN_Handler(void *btn) {
-    printf("KEY4 Press.\r\n");
-    if (gMode == NFCMODE) {
-        gMode = MANMODE;
-    } else if (gMode == MANMODE) {
-        gMode = NFCMODE;
-    }
-    printf("Drop Mode Change.\r\n");
-    // printf("Drop Mode :%d\r\n", gMode );
-
+    HAL_UART_Transmit(&huart3, "key4 press\n", sizeof("key1 press\n") - 1, 0xffff);
 }
 
-//声明从机步进电机的位置
-int BOX_ID = 3;
 void KEY5_PRESS_DOWN_Handler(void *btn) {
-    printf("KEY5 Press.\r\n");
-    //printf("Start Drop.\r\n");
-
-    BOX_ID--;
-    if (StepID == STEPBOX) {
-        SM_For_SubBox.Step2PointPlace(&SM_For_SubBox, SubBox_Buffer[BOX_ID]);
-    } else if (StepID == STEPCUP) {
-        SM_For_littleCup.Step2PointPlace(&SM_For_littleCup, 3);
-    }
+    HAL_UART_Transmit(&huart3, "key5 press\n", sizeof("key1 press\n") - 1, 0xffff);
 }
 
 void KEY6_PRESS_DOWN_Handler(void *btn) {
-    printf("KEY6 Press.\r\n");
-
-    BOX_ID++;
-    if (StepID == STEPBOX) {
-        SM_For_SubBox.Step2PointPlace(&SM_For_SubBox, SubBox_Buffer[BOX_ID]);
-    } else if (StepID == STEPCUP) {
-        SM_For_littleCup.Step2PointPlace(&SM_For_littleCup, 0);
-    }
-    BOX_ID = BOX_ID % 4;
+    HAL_UART_Transmit(&huart3, "Encoder press\n", sizeof("Encoder press\n") - 1, 0xffff);
 }

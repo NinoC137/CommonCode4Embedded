@@ -10,11 +10,6 @@
 #include "string.h"
 #include "main.h"
 
-#define NFCMODE     1
-#define MANMODE     2
-#define STEPCUP     1
-#define STEPBOX     2
-
 //According to your need to modify the constants.
 #define TICKS_INTERVAL    5    //ms
 #define DEBOUNCE_TICKS    2    //MAX 8
@@ -83,14 +78,11 @@ void KEY6_PRESS_DOWN_Handler(void *btn);
 
 extern struct Button KEY1;
 extern struct Button KEY2;
-extern struct Button KEY3; //步进电机切换
-extern struct Button KEY4; //下药手动切换
-extern struct Button KEY5; //
-extern struct Button KEY6; //功能待定
+extern struct Button KEY3;
+extern struct Button KEY4;
+extern struct Button KEY5;
+extern struct Button KEY6;
 
-
-extern int gMode;//下药模式, NFC 或 手动
-extern int StepID;//控制的步进电机，主机或从机
 #ifdef __cplusplus
 }
 #endif
